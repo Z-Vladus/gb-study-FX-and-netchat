@@ -14,24 +14,11 @@ public class NetChatController {
     @FXML
     private TextField messageField;
 
-    private int textAreaIndex=0;
 
     public void sendButtonClick(ActionEvent actionEvent) {
         System.out.println("sendbtnclick");
         messageArea.insertText(0, "["+ LocalDateTime.now() +"] " + messageField.getText() + "\n");
 
-        //textAreaIndex++;
     }
-   /* @FXML
-    private Label welcomeText;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-
-
-    */
-
-
 
 }
