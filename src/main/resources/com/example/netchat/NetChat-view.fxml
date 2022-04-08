@@ -11,7 +11,7 @@
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.netchat.NetChatController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
     </padding>
     <TextArea fx:id="messageArea" VBox.vgrow="ALWAYS" editable="false"/>
     <HBox spacing="20">
