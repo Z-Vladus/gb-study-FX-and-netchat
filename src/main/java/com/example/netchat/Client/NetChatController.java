@@ -1,4 +1,4 @@
-package com.example.netchat;
+package com.example.netchat.Client;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
