@@ -1,7 +1,10 @@
 package com.example.netchat.Server;
 
-public interface AuthService {
+import java.io.Closeable;
+
+public interface AuthService extends Closeable {
     void start();
+    void close();
     String getNickByLoginPass(String login, String pass);
-    void stop();
-}
+
+ }

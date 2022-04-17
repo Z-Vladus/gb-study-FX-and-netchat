@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ClientHandler {
-    private MyServer myServer;
+    private ChatServer chatServer;
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
@@ -14,9 +14,9 @@ public class ClientHandler {
     public String getName() {
         return name;
     }
-    public ClientHandler(MyServer myServer, Socket socket) {
+    public ClientHandler(ChatServer chatServer, Socket socket) {
         try {
-            this.myServer = myServer;
+            this.chatServer = chatServer;
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
@@ -41,13 +41,13 @@ public class ClientHandler {
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
                 String nick =
-                        myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
+                        chatServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                 if (nick != null) {
-                    if (!myServer.isNickBusy(nick)) {
+                    if (!chatServer.isNickBusy(nick)) {
                         sendMsg("/authok " + nick);
                         name = nick;
-                        myServer.broadcastMsg(name + " зашел в чат");
-                        myServer.subscribe(this);
+                        chatServer.broadcastMsg(name + " зашел в чат");
+                        chatServer.subscribe(this);
                         return;
                     } else {
                         sendMsg("Учетная запись уже используется");
@@ -65,7 +65,7 @@ public class ClientHandler {
             if (strFromClient.equals("/end")) {
                 return;
             }
-            myServer.broadcastMsg(name + ": " + strFromClient);
+            chatServer.broadcastMsg(name + ": " + strFromClient);
         }
     }
     public void sendMsg(String msg) {
@@ -76,8 +76,8 @@ public class ClientHandler {
         }
     }
     public void closeConnection() {
-        myServer.unsubscribe(this);
-        myServer.broadcastMsg(name + " вышел из чата");
+        chatServer.unsubscribe(this);
+        chatServer.broadcastMsg(name + " вышел из чата");
         try {
             in.close();
         } catch (IOException e) {

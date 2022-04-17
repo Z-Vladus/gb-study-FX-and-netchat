@@ -16,9 +16,14 @@ public class NetChatController {
 
 
     public void sendButtonClick(ActionEvent actionEvent) {
-        System.out.println("sendbtnclick");
-        messageArea.insertText(0, "["+ LocalDateTime.now() +"] " + messageField.getText() + "\n");
+        //System.out.println("sendbtnclick");
+        if (messageField.getText().length()>1) { // если есть что посылать
+            messageArea.insertText(0, "[" + LocalDateTime.now() + "] " + messageField.getText() + "\n");
+            messageField.clear();
+
+        }
 
     }
+
 
 }
