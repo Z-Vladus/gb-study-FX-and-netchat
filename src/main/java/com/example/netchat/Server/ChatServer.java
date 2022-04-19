@@ -10,14 +10,26 @@ public class ChatServer {
     private final int PORT = 8189;
     private List<ClientHandler> clients;
     private AuthService authService;
-    public AuthService getAuthService() {
-        return authService;
+
+    public void run() {
+        try (ServerSocket server = new ServerSocket(PORT);
+            ) {
+            while (true) {
+                System.out.println("Server awaits incoming connections...");
+                Socket socket = server.accept();
+                System.out.println("Client " +socket.getInetAddress()+ " connected");
+                new ClientHandler(this, socket);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public ChatServer() {
         try (ServerSocket server = new ServerSocket(PORT)) {
-            authService = new BaseAuthService();
-            authService.start();
+            //authService = new BaseAuthService();
+            //authService.start();
             clients = new ArrayList<>();
 
             while (true) {
@@ -28,12 +40,14 @@ public class ChatServer {
             }
         } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");
-        } finally {
-            if (authService != null) {
-                authService.close();
-            }
         }
+ //         finally {
+ //           if (authService != null) {
+ //               authService.close();
+ //           }
+ //       }
     }
+
     public synchronized boolean isNickBusy(String nick) {
         for (ClientHandler o : clients) {
             if (o.getName().equals(nick)) {
@@ -42,6 +56,7 @@ public class ChatServer {
         }
         return false;
     }
+
     public synchronized void broadcastMsg(String msg) {
         for (ClientHandler o : clients) {
             o.sendMsg(msg);
@@ -51,8 +66,12 @@ public class ChatServer {
     public synchronized void unsubscribe(ClientHandler o) {
         clients.remove(o);
     }
+
     public synchronized void subscribe(ClientHandler o) {
         clients.add(o);
     }
 
+    public AuthService getAuthService() {
+        return this.authService;
+    }
 }

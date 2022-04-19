@@ -6,14 +6,19 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ClientHandler {
-    private ChatServer chatServer;
-    private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private final ChatServer chatServer;
+    private final Socket socket;
+    private final DataInputStream in;
+    private final DataOutputStream out;
     private String name;
+    private String nick;
+
+
+
     public String getName() {
         return name;
     }
+
     public ClientHandler(ChatServer chatServer, Socket socket) {
         try {
             this.chatServer = chatServer;
@@ -21,6 +26,8 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "";
+
+
             new Thread(() -> {
                 try {
                     authentication();
@@ -32,12 +39,36 @@ public class ClientHandler {
                 }
             }).start();
         } catch (IOException e) {
-            throw new RuntimeException("Проблемы при создании обработчика клиента");
+            throw new RuntimeException("ClientHandler problem");
         }
     }
+
+
+    public void auth () {
+        while (true) {
+
+            try {
+                final String buf = in.readUTF();
+                if (buf.startsWith("/auth")) {
+                    final String[] buf2 = buf.split(" "); // buf2[0]="/auth"
+                    final String login=buf2[1];
+                    final String pass=buf2[2];
+                    // TODO
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    //пока оставим метод из (товтология!) методички
     public void authentication() throws IOException {
         while (true) {
+
             String str = in.readUTF();
+
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
                 String nick =
@@ -78,20 +109,26 @@ public class ClientHandler {
     public void closeConnection() {
         chatServer.unsubscribe(this);
         chatServer.broadcastMsg(name + " вышел из чата");
+
         try {
-            in.close();
+            if (in != null ) in.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new RuntimeException("Input stream close problem");
         }
+
         try {
             out.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new RuntimeException("Output stream close problem");
         }
+
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new RuntimeException("socket close problem");
         }
     }
 }
