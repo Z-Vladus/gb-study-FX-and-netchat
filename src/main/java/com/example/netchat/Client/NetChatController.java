@@ -2,28 +2,70 @@ package com.example.netchat.Client;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class NetChatController {
+
+    private ChatClient client;
+    @FXML
+    private HBox loginBox;
+    @FXML
+    private TextField loginField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private VBox messageBox;
     @FXML
     private TextArea messageArea;
     @FXML
     private TextField messageField;
 
 
-    public void sendButtonClick(ActionEvent actionEvent) {
-        //System.out.println("sendbtnclick");
-        if (messageField.getText().length()>1) { // если есть что посылать
-            messageArea.insertText(0, "[" + LocalDateTime.now() + "] " + messageField.getText() + "\n");
-            messageField.clear();
-
+    public NetChatController(){
+        this.client=new ChatClient(this);
+        try {
+            client.openConnection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
 
+    public void sendButtonClick(ActionEvent actionEvent) {
+        //System.out.println("sendbtnclick");
+        //if (messageField.getText().length()>1) { // если есть что посылать
+        //    messageArea.insertText(0, "[" + LocalDateTime.now() + "] " + messageField.getText() + "\n");
+        //    messageField.clear();
 
+        String buf = messageField.getText();
+        if (buf.trim().isEmpty()) return;
+        client.sendMessage(buf);
+        messageField.clear();
+        messageField.requestFocus();
+
+
+    }
+
+    public void authButtonClick(ActionEvent actionEvent) {
+        System.out.println("LoginBtnClick");
+        client.sendMessage("/auth"+loginField.getText() + " "+ passwordField.getText());
+
+    }
+
+    public void addMessage(String s) {
+        messageArea.appendText(s+"\n");
+
+    }
+
+    public void setAuth(boolean authorized) {
+        loginBox.setVisible(!authorized);
+        messageBox.setVisible(authorized);
+    }
 }

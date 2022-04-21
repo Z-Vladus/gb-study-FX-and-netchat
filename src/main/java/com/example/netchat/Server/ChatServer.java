@@ -18,7 +18,7 @@ public class ChatServer {
                 System.out.println("Server awaits incoming connections...");
                 Socket socket = server.accept();
                 System.out.println("Client " +socket.getInetAddress()+ " connected");
-                new ClientHandler(this, socket);
+                new ClientHandler(this, socket,authService);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -36,7 +36,7 @@ public class ChatServer {
                 System.out.println("Сервер ожидает подключения");
                 Socket socket = server.accept();
                 System.out.println("Клиент подключился");
-                new ClientHandler(this, socket);
+                new ClientHandler(this, socket,authService);
             }
         } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");
@@ -57,7 +57,7 @@ public class ChatServer {
         return false;
     }
 
-    public synchronized void broadcastMsg(String msg) {
+    public synchronized void serverMsgToAll(String msg) {
         for (ClientHandler o : clients) {
             o.sendMsg(msg);
         }
