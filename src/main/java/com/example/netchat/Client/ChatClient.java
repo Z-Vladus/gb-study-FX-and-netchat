@@ -38,6 +38,20 @@ public class ChatClient {
     }
 
     private void readMsg() {
+        while (true){
+            try {
+                String buf = in.readUTF();
+                if("/end".equals(buf)) {
+                    controller.setAuth(false);
+                    break;
+                }
+                controller.addMessage("readMSG: "+buf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
     }
 
     private void waitAuth() {
@@ -49,7 +63,7 @@ public class ChatClient {
                     String nick = bufSplitted[1];
                     controller.addMessage("Auth good with nick = "+nick);
                     controller.setAuth(true);
-
+                    break;
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

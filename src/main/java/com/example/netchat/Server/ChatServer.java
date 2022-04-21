@@ -28,9 +28,10 @@ public class ChatServer {
 
     public ChatServer() {
         try (ServerSocket server = new ServerSocket(PORT)) {
-            //authService = new BaseAuthService();
-            //authService.start();
+            authService = new BaseAuthService();
+            authService.start();
             clients = new ArrayList<>();
+
 
             while (true) {
                 System.out.println("Сервер ожидает подключения");
