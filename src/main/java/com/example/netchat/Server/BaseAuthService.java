@@ -8,20 +8,25 @@ public class BaseAuthService implements AuthService{
         private String login;
         private String pass;
         private String nick;
+
         public UserID(String login, String pass, String nick) {
             this.login = login;
             this.pass = pass;
             this.nick = nick;
         }
     }
+
     private List<UserID> userIDs;
     @Override
     public void start() {
-        System.out.println("Сервис аутентификации запущен");
+        System.out.println("Auth service started. Available clients:");
+        for (UserID userID : userIDs) {
+            System.out.println("login="+userID.login+" pass="+userID.nick);
+        }
     }
     @Override
     public void close() {
-        System.out.println("Сервис аутентификации остановлен");
+        System.out.println("Auth service stopped");
     }
     public BaseAuthService() {
         userIDs = new ArrayList<>();

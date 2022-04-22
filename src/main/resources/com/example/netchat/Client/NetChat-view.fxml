@@ -26,8 +26,8 @@
     </VBox>
 
     <HBox spacing="20">
-        <TextField fx:id="messageField" HBox.hgrow="ALWAYS"/>
-        <Button text="Отпр." onAction="#sendButtonClick" defaultButton="true" />
+        <TextField fx:id="messageField" HBox.hgrow="ALWAYS" visible="false"/>
+        <Button text="Отпр." onAction="#sendButtonClick" defaultButton="true" visible="false" />
     </HBox>
 
 </VBox>

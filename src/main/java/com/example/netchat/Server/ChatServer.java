@@ -32,7 +32,6 @@ public class ChatServer {
             authService.start();
             clients = new ArrayList<>();
 
-
             while (true) {
                 System.out.println("Сервер ожидает подключения");
                 Socket socket = server.accept();
@@ -42,11 +41,11 @@ public class ChatServer {
         } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");
         }
- //         finally {
- //           if (authService != null) {
- //               authService.close();
- //           }
- //       }
+          finally {
+            if (authService != null) {
+                authService.close();
+            }
+        }
     }
 
     public synchronized boolean isNickBusy(String nick) {

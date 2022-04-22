@@ -27,7 +27,6 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "";
 
-
             new Thread(() -> {
                 try {
                     authentication();
@@ -101,7 +100,14 @@ public class ClientHandler {
             String buf = in.readUTF();
             System.out.println("received from "+name + ": " + buf);
             if (buf.equals("/end")) {
-                return;
+                System.out.println("received /end command. Exiting");
+                // default code
+                // return;
+
+                // my code 22/04/22
+                closeConnection();
+                break;
+                // end my code 22/04/22
             }
             chatServer.serverMsgToAll(name + ": " + buf);
         }

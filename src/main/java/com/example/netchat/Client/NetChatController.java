@@ -30,6 +30,8 @@ public class NetChatController {
 
     public NetChatController(){
         this.client=new ChatClient(this);
+//        loginField.setText("user1");
+//        passwordField.setText("pass1");
         try {
             client.openConnection();
         } catch (IOException e) {
@@ -54,8 +56,9 @@ public class NetChatController {
     }
 
     public void authButtonClick(ActionEvent actionEvent) {
-        System.out.println("LoginBtnClick");
-        client.sendMessage("/auth"+loginField.getText() + " "+ passwordField.getText());
+        loginField.setText("user1");
+        passwordField.setText("pass2");
+        client.sendMessage("/auth "+loginField.getText() + " "+ passwordField.getText());
 
     }
 

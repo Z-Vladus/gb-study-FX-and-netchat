@@ -17,7 +17,9 @@ public class ChatClient {
     }
 
     public void openConnection () throws IOException {
+        System.out.println("Opening connection...");
         s = new Socket("localhost",8189);
+
         in = new DataInputStream(s.getInputStream());
         out = new DataOutputStream(s.getOutputStream());
 
@@ -28,19 +30,24 @@ public class ChatClient {
             } finally {
               closeConnection();  
             }
-            
-
         }).start();
 
     }
 
     private void closeConnection() {
+        try {
+            s.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void readMsg() {
         while (true){
             try {
+                System.out.println("Reading input stream...");
                 String buf = in.readUTF();
+                System.out.println("Done. Result: "+buf);
                 if("/end".equals(buf)) {
                     controller.setAuth(false);
                     break;
@@ -57,7 +64,9 @@ public class ChatClient {
     private void waitAuth() {
         while (true) {
             try {
+                System.out.println("waiting for server auth reply...");
                 String buf = in.readUTF();
+                System.out.println("Got reply. buf="+buf);
                 if (buf.startsWith("/authok")) {
                     String[] bufSplitted = buf.split(" ");
                     String nick = bufSplitted[1];
@@ -74,6 +83,7 @@ public class ChatClient {
 
     public void sendMessage(String s) {
         try {
+            System.out.println("sending message:"+s);
             out.writeUTF(s);
         } catch (IOException e) {
             throw new RuntimeException(e);
