@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -12,6 +13,9 @@ import java.time.LocalDateTime;
 public class NetChatController {
 
     private ChatClient client;
+
+    @FXML
+    public Button sendButton;
     @FXML
     private HBox loginBox;
     @FXML
@@ -27,11 +31,8 @@ public class NetChatController {
     @FXML
     private TextField messageField;
 
-
     public NetChatController(){
         this.client=new ChatClient(this);
-//        loginField.setText("user1");
-//        passwordField.setText("pass1");
         try {
             client.openConnection();
         } catch (IOException e) {
@@ -56,8 +57,8 @@ public class NetChatController {
     }
 
     public void authButtonClick(ActionEvent actionEvent) {
-        loginField.setText("user1");
-        passwordField.setText("pass2");
+        //loginField.setText("user1");
+        //passwordField.setText("pass1");
         client.sendMessage("/auth "+loginField.getText() + " "+ passwordField.getText());
 
     }
@@ -70,5 +71,8 @@ public class NetChatController {
     public void setAuth(boolean authorized) {
         loginBox.setVisible(!authorized);
         messageBox.setVisible(authorized);
+        sendButton.setVisible(authorized);
+        messageField.setVisible(authorized);
+
     }
 }

@@ -21,7 +21,7 @@ public class BaseAuthService implements AuthService{
     public void start() {
         System.out.println("Auth service started. Available clients:");
         for (UserID userID : userIDs) {
-            System.out.println("login="+userID.login+" pass="+userID.nick);
+            System.out.println("login="+userID.login+" pass="+userID.pass);
         }
     }
     @Override
@@ -33,6 +33,9 @@ public class BaseAuthService implements AuthService{
         userIDs.add(new UserID("user1", "pass1", "nick1"));
         userIDs.add(new UserID("user2", "pass2", "nick2"));
         userIDs.add(new UserID("user3", "pass3", "nick3"));
+        userIDs.add(new UserID("u4", "p4", "n4"));
+        userIDs.add(new UserID("u5", "p5", "n5"));
+        userIDs.add(new UserID("u6", "p6", "n6"));
     }
     @Override
     public String getNickByLoginPass(String login, String pass) {

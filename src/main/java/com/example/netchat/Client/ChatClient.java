@@ -66,12 +66,13 @@ public class ChatClient {
             try {
                 System.out.println("waiting for server auth reply...");
                 String buf = in.readUTF();
-                System.out.println("Got reply. buf="+buf);
+                System.out.println("Got reply from server. buf="+buf);
                 if (buf.startsWith("/authok")) {
                     String[] bufSplitted = buf.split(" ");
                     String nick = bufSplitted[1];
                     controller.addMessage("Auth good with nick = "+nick);
                     controller.setAuth(true);
+
                     break;
                 }
             } catch (IOException e) {

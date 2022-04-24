@@ -49,8 +49,8 @@ public class ChatServer {
     }
 
     public synchronized boolean isNickBusy(String nick) {
-        for (ClientHandler o : clients) {
-            if (o.getName().equals(nick)) {
+        for (ClientHandler client : clients) {
+            if (client.getName().equals(nick)) {
                 return true;
             }
         }
@@ -58,8 +58,8 @@ public class ChatServer {
     }
 
     public synchronized void serverMsgToAll(String msg) {
-        for (ClientHandler o : clients) {
-            o.sendMsg(msg);
+        for (ClientHandler client : clients) {
+            client.sendMsg(msg);
         }
     }
 
@@ -73,5 +73,25 @@ public class ChatServer {
 
     public AuthService getAuthService() {
         return this.authService;
+    }
+
+    public synchronized void serverMsgToNick(String senderNick, String mateNick, String mateMsg) {
+        System.out.println("проверяем занят ли ник которому прислали приватное сообщение");
+        if (isNickBusy(mateNick)) {
+            //найдём и отошлём сообщение адресату
+            for (ClientHandler client : clients) {
+                if (client.getName().equals(mateNick)) {
+                    client.sendMsg("Вам сообщение от " + senderNick + ":" + mateMsg);
+                }
+            }
+        } else {
+            System.out.println("");
+            //если такого ника нет на связи, отсылаем сообщение отправителю
+            for (ClientHandler client : clients) {
+                if (client.getName().equals(senderNick)) {
+                    client.sendMsg("Сервер: Ошибка! нет пользователя с ником " + mateMsg + "!");
+                }
+            }
+        }
     }
 }

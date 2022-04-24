@@ -11,9 +11,7 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
     private String name;
-    private String nick;
-
-
+    //private String nick;
 
     public String getName() {
         return name;
@@ -52,7 +50,7 @@ public class ClientHandler {
                     final String[] buf2 = buf.split(" "); // buf2[0]="/auth"
                     final String login=buf2[1];
                     final String pass=buf2[2];
-                    // TODO
+
                 }
 
             } catch (IOException e) {
@@ -109,7 +107,23 @@ public class ClientHandler {
                 break;
                 // end my code 22/04/22
             }
-            chatServer.serverMsgToAll(name + ": " + buf);
+            // если приватное сообщение...
+            else if (buf.startsWith("/w ")) {
+                System.out.println("получена команда приватного сообщения:");
+                //распарсим буфер
+                String[] buf2 = buf.split("\\s");
+                String mateNick = buf2[1];
+                String mateMsg = buf2[2];
+                System.out.println("кому сообщение:"+mateNick);
+                System.out.println("сообщение:"+mateMsg);
+                chatServer.serverMsgToNick(name,mateNick,mateMsg);
+            }
+            //в остальных случаях
+            else {
+                chatServer.serverMsgToAll(name + ": " + buf);
+            }
+
+
         }
     }
     public void sendMsg(String msg) {
