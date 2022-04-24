@@ -23,15 +23,16 @@ public class ChatClient {
         in = new DataInputStream(s.getInputStream());
         out = new DataOutputStream(s.getOutputStream());
 
-        new Thread(() -> {
+        Thread readThread = new Thread (() -> {
             try {
                 waitAuth();
                 readMsg();
             } finally {
               closeConnection();  
             }
-        }).start();
-
+        });
+        readThread.setDaemon(true);
+        readThread.start();
     }
 
     private void closeConnection() {
