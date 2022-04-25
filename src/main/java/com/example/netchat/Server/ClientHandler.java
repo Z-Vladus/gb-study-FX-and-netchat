@@ -70,15 +70,11 @@ public class ClientHandler {
             if (Command.isCommand(buf)) {
                 Command command = Command.getCommand(buf);
                 String[] params = command.parse(buf);
-                //TODO лекция 1:04:00
-
-
-            // формат команды аутентификации: /auth <login> <password>
+                // формат команды аутентификации: /auth <login> <password>
                 if (command==Command.AUTH) {
                     //разделяем на слова
-                    String[] splittedBuf = buf.split("\\s+");
-                    String login = splittedBuf[1];
-                    String password = splittedBuf[2];
+                    String login = params[0];
+                    String password = params[1];
                     System.out.println("Buf parsing: Login = "+login+" password="+password);
                     //String nick = chatServer.getAuthService().getNickByLoginPass(login, password);
                     String nick = authService.getNickByLoginPass(login, password);
@@ -87,6 +83,8 @@ public class ClientHandler {
                     System.out.println("Got nick: "+nick);
                     if (!chatServer.isNickBusy(nick)) {
                         System.out.println("Nick="+nick+" is not busy");
+                        //TODO 1:07
+
                         sendMsg("/authok " + nick);
                         name = nick;
                         chatServer.serverMsgToAll("Сервер: "+name+" зашёл в чат");

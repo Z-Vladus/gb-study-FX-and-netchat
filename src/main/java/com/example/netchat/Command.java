@@ -34,7 +34,16 @@ public enum Command {
         public String[] parse(String commandText) {
             return new String[0];
         }
+    },
+    ERROR("/error"){ // /error сообщение об ошибке
+        @Override
+        public String[] parse(String commandText) {
+            String errorMsg = commandText.split(COMMAND_DELIMITER, 2)[1];
+            return new String[]{errorMsg};
+
+        }
     };
+
 
     /*
     // вариант Мап 1
