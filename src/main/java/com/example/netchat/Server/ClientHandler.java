@@ -1,5 +1,7 @@
 package com.example.netchat.Server;
 
+import com.example.netchat.Command;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -11,7 +13,7 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
     private String name;
-    //private String nick;
+    private AuthService authService;
 
     public String getName() {
         return name;
@@ -24,6 +26,7 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "";
+            this.authService=authService;
 
             new Thread(() -> {
                 try {
@@ -63,16 +66,22 @@ public class ClientHandler {
     //пока оставим метод из (товтология!) методички
     public void authentication() throws IOException {
         while (true) {
-
             String buf = in.readUTF();
+            if (Command.isCommand(buf)) {
+                Command command = Command.getCommand(buf);
+                String[] params = command.parse(buf);
+                //TODO лекция 1:04:00
+
+
             // формат команды аутентификации: /auth <login> <password>
-            if (buf.startsWith("/auth")) {
-                //разделяем на слова
-                String[] splittedBuf = buf.split("\\s+");
-                String login = splittedBuf[1];
-                String password = splittedBuf[2];
-                System.out.println("Buf parsing: Login = "+login+" password="+password);
-                String nick = chatServer.getAuthService().getNickByLoginPass(login, password);
+                if (command==Command.AUTH) {
+                    //разделяем на слова
+                    String[] splittedBuf = buf.split("\\s+");
+                    String login = splittedBuf[1];
+                    String password = splittedBuf[2];
+                    System.out.println("Buf parsing: Login = "+login+" password="+password);
+                    //String nick = chatServer.getAuthService().getNickByLoginPass(login, password);
+                    String nick = authService.getNickByLoginPass(login, password);
 
                 if (nick != null) {
                     System.out.println("Got nick: "+nick);

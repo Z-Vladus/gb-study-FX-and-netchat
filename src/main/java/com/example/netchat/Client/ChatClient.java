@@ -5,6 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+
+
+
 public class ChatClient {
     private Socket s;
     private DataInputStream in;
@@ -12,7 +15,7 @@ public class ChatClient {
 
     private final NetChatController controller;
 
-    public ChatClient(NetChatController controller) {
+     public ChatClient(NetChatController controller) {
         this.controller = controller;
     }
 
