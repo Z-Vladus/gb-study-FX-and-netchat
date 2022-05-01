@@ -71,49 +71,59 @@ public class ClientHandler {
                 Command command = Command.getCommand(buf);
                 String[] params = command.parse(buf);
                 // формат команды аутентификации: /auth <login> <password>
-                if (command==Command.AUTH) {
+                if (command == Command.AUTH) {
                     //разделяем на слова
                     String login = params[0];
                     String password = params[1];
-                    System.out.println("Buf parsing: Login = "+login+" password="+password);
+                    System.out.println("Buf parsing: Login = " + login + " password=" + password);
                     //String nick = chatServer.getAuthService().getNickByLoginPass(login, password);
                     String nick = authService.getNickByLoginPass(login, password);
 
-                if (nick != null) {
-                    System.out.println("Got nick: "+nick);
-                    if (!chatServer.isNickBusy(nick)) {
-                        System.out.println("Nick="+nick+" is not busy");
-                        //TODO 1:07
-
-                        sendMsg("/authok " + nick);
-                        name = nick;
-                        chatServer.serverMsgToAll("Сервер: "+name+" зашёл в чат");
-                        chatServer.subscribe(this);
-                        //return;
-                        break;
+                    if (nick != null) {
+                        System.out.println("Got nick: " + nick);
+                        if (!chatServer.isNickBusy(nick)) {
+                            System.out.println("Nick=" + nick + " is not busy");
+                            //sendMsg("/authok " + nick);
+                            sendMsg(Command.AUTHOK,nick);
+                            name = nick;
+                            chatServer.serverMsgToAll("Сервер: " + name + " зашёл в чат");
+                            chatServer.subscribe(this);
+                            //return;
+                            break;
+                        } else {
+                            sendMsg(Command.ERROR, "Учетная запись " + login + " уже используется");
+                        }
                     } else {
-                        sendMsg("Учетная запись "+login+" уже используется");
+                        sendMsg(Command.ERROR, "Неверные логин/пароль");
                     }
-                } else {
-                    sendMsg("Неверные логин/пароль");
                 }
             }
         }
     }
+
     public void readMessages() throws IOException {
         while (true) {
             String buf = in.readUTF();
             System.out.println("received from "+name + ": " + buf);
+
+            /*
             if (buf.equals("/end")) {
                 System.out.println("received /end command. Exiting");
                 // default code
                 // return;
-
-                // my code 22/04/22
+                // [my code] 22/04/22 ->
                 closeConnection();
                 break;
-                // end my code 22/04/22
+                // <- [end my code]
             }
+            */
+
+            if (Command.isCommand(buf) && Command.getCommand(buf) == Command.END ){
+                //todo оставим ли тут closeConnection(); ?
+                //closeConnection();
+                break;
+            }
+
             // если приватное сообщение...
             else if (buf.startsWith("/w ")) {
                 System.out.println("получена команда приватного сообщения:");
@@ -142,8 +152,10 @@ public class ClientHandler {
             throw new RuntimeException("sending message problem");
         }
     }
+
     public void closeConnection() {
-        sendMsg("/end");
+        //sendMsg("/end");
+        sendMsg(Command.END);
         chatServer.unsubscribe(this);
         chatServer.serverMsgToAll("Server: "+name + " вышел из чата");
 
@@ -168,5 +180,11 @@ public class ClientHandler {
             //e.printStackTrace();
             throw new RuntimeException("socket close problem");
         }
+    }
+
+
+    private void sendMsg(Command command, String... params) {
+        sendMsg(command.collectMessage(params));
+
     }
 }

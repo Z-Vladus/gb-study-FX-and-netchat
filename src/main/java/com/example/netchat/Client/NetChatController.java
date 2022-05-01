@@ -1,5 +1,6 @@
 package com.example.netchat.Client;
 
+import com.example.netchat.Command;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -89,7 +90,8 @@ public class NetChatController {
     public void authButtonClick(ActionEvent actionEvent) {
         //loginField.setText("user1");
         //passwordField.setText("pass1");
-        client.sendMessage("/auth "+loginField.getText() + " "+ passwordField.getText());
+        //client.sendMessage("/auth "+loginField.getText() + " "+ passwordField.getText());
+        client.sendMessage(Command.AUTH,loginField.getText(),passwordField.getText());
 
     }
 
@@ -104,5 +106,14 @@ public class NetChatController {
         sendButton.setVisible(authorized);
         messageField.setVisible(authorized);
 
+    }
+
+    public void showError(String[] error) {
+        Alert alert =
+                new Alert(Alert.AlertType.ERROR,
+                    error[0],
+                    new ButtonType("OK", ButtonBar.ButtonData.OK_DONE));
+        alert.setTitle("Ошибка!");
+        alert.showAndWait();
     }
 }

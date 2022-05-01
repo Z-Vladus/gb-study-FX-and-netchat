@@ -11,7 +11,7 @@ public enum Command {
         @Override
         public String[] parse(String commandText) {
             String[] split = commandText.split(COMMAND_DELIMITER);
-            return new String[]{split[0],split[1]};
+            return new String[]{split[1],split[2]};
         }
     },
     AUTHOK("/authok") {
@@ -112,4 +112,16 @@ public enum Command {
 
     public abstract String[] parse(String commandText);
 
+    public String collectMessage(String[] params) {
+        String cmd = this.getCommand();
+        /*
+        String join = String.join(" ", params);
+        return cmd + " " + join;
+        */
+        return cmd + (
+                params == null
+                        ? ""
+                        : " " + String.join(" ", params)
+                );
+    }
 }

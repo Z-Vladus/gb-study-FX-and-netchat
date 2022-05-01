@@ -11,11 +11,9 @@ import java.util.stream.Collectors;
 
 public class ChatServer {
     private final int PORT = 8189;
-    //private List<ClientHandler> clients;
     private Map<String, ClientHandler> clients;
     private AuthService authService;
-
-    public void run() {
+   public void run() {
         try (ServerSocket server = new ServerSocket(PORT);
              AuthService authService = new BaseAuthService()
             ) {
@@ -30,8 +28,6 @@ public class ChatServer {
         }
 
     }
-
-
 
     public ChatServer() {
         this.clients = new HashMap<>();
