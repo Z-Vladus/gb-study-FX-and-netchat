@@ -1,6 +1,4 @@
-package com.example.netchat;
-
-//
+package com.example.netchat.Client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +12,7 @@ public class NetChatApp extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(NetChatApp.class.getResource("NetChat-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 640, 480);
-        stage.setTitle("Net Chat APP v0.2");
+        stage.setTitle("Net Chat APP v0.4");
         stage.setScene(scene);
         stage.show();
     }
