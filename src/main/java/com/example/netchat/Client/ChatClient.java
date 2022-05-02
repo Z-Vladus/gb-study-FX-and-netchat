@@ -88,7 +88,7 @@ public class ChatClient {
                 if (Command.isCommand(buf)) {
                     Command cmd = Command.getCommand(buf);
                     String[] params = cmd.parse(buf);
-                    if (cmd == Command.AUTH) {
+                    if (cmd == Command.AUTHOK) {
                         String nick = params[0];
                         controller.addMessage("Auth good with nick = "+nick);
                         controller.setAuth(true);

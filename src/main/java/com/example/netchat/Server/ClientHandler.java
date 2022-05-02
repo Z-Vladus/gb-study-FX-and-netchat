@@ -118,10 +118,16 @@ public class ClientHandler {
             }
             */
 
-            if (Command.isCommand(buf) && Command.getCommand(buf) == Command.END ){
-                //todo оставим ли тут closeConnection(); ?
-                //closeConnection();
-                break;
+            if (Command.isCommand(buf) ){
+                Command cmd = Command.getCommand(buf);
+                if (cmd == Command.END ) {
+                    //todo оставим ли тут closeConnection(); ?
+                    //closeConnection();
+                    break;
+                }
+                if () {
+
+                }
             }
 
             // если приватное сообщение...
