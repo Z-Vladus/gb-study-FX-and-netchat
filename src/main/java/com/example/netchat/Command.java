@@ -42,6 +42,21 @@ public enum Command {
             return new String[]{errorMsg};
 
         }
+
+
+    },
+    CLIENTS("/"){
+        @Override
+        public String[] parse(String commandText) {
+            String[] split = commandText.split(COMMAND_DELIMITER);
+
+            //вариант через цикл
+            String[] nicks = new String[split.length-1];
+            for (int i = 1; i < split.length; i++) {
+                nicks[i-1]=split[i];
+            }
+            return nicks;
+        }
     };
 
 

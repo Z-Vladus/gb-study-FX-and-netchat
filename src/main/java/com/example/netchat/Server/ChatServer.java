@@ -79,7 +79,7 @@ public class ChatServer {
     public synchronized void serverMsgToAll(String msg) {
         List<String> allUsersOnline = clients.values().stream().
                 map(ClientHandler::getName).collect(Collectors.toList());
-      // TODO что это такое ClientListMessage ???
+      // TODO что это такое ClientListMessage ??? 8-й урок 2ч 34м
         //  broadcast(ClientListMessage.of(allUsersOnline));
 
         // пока оставим так
@@ -97,13 +97,28 @@ public class ChatServer {
     public synchronized void subscribe(ClientHandler o) {
         //clients.add(o);
         clients.put(o.getName(),o);
+        broadcastClientList();
+    }
+
+    private void broadcastClientList() {
+        //clients.values().stream().map(client -> client.getName()).collect(Collectors.joining(" "));
+        //вариант2 предлагает ИДЕЯ
+        String nicks= clients.values().stream().map(ClientHandler::getName).collect(Collectors.joining(" "));
+        broadcast(Command.CLIENTS, nicks);
+
     }
 
     public synchronized void unsubscribe(ClientHandler o) {
         clients.remove(o.getName());
+        broadcastClientList();
     }
     public synchronized void broadcast(String msg) {
-        clients.values().forEach(client -> client.sendMsg(msg));
+        // OLD
+        // clients.values().forEach(client -> client.sendMsg(msg));
+        for (ClientHandler client : clients.values()) {
+            client.sendMsg(Command.CLIENTS,nicks);
+
+        }
     }
 
     public synchronized void serverMsgToNick(String senderNick, String mateNick, String mateMsg) {
