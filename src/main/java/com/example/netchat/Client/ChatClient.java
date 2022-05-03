@@ -8,9 +8,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-
-
-
 public class ChatClient {
     private Socket s;
     private DataInputStream in;
@@ -64,8 +61,11 @@ public class ChatClient {
                         break;
                     }
                     if (cmd == Command.ERROR) {
-                        controller.showError(params);
-
+                        Platform.runLater(() -> controller.showError(params));
+                        // OLD
+                        // controller.showError(params);
+                        break;
+                        // continue;
                     }
                 }
 
@@ -92,27 +92,17 @@ public class ChatClient {
                         String nick = params[0];
                         controller.addMessage("Auth good with nick = "+nick);
                         controller.setAuth(true);
+                        break;
                     }
                     if (cmd==Command.ERROR) {
                         // так - неверно, будет ошибка
                         //controller.showError(params);
                         // а вот с таким магическим заклинанием - норм!
                         Platform.runLater(() -> controller.showError(params));
-
-
                     }
 
                 }
-                /*
-                if (buf.startsWith("/authok")) {
-                    String[] bufSplitted = buf.split(" ");
-                    String nick = bufSplitted[1];
-                    controller.addMessage("Auth good with nick = "+nick);
-                    controller.setAuth(true);
 
-                    break;
-                }
-                */
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

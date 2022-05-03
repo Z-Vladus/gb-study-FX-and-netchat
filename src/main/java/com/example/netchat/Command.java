@@ -106,6 +106,12 @@ public enum Command {
              }
         }
 
+        Command command1 = cmdMap.get(message);
+        if (command1==null) {
+            throw new RuntimeException("<"+"> is not a recognized command!");
+        }
+
+
         return null;
 
     }

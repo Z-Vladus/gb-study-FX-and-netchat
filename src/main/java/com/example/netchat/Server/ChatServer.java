@@ -1,5 +1,7 @@
 package com.example.netchat.Server;
 
+import com.example.netchat.Command;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,7 +23,7 @@ public class ChatServer {
                 System.out.println("Server awaits incoming connections...");
                 Socket socket = server.accept();
                 System.out.println("Client " +socket.getInetAddress()+ " connected");
-                new ClientHandler(this, socket,authService);
+                new ClientHandler(this, socket, authService);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -67,16 +69,29 @@ public class ChatServer {
         return false; */
     }
 
+    /*    private void broadcastClientList() {
+        final List<String> nicks = clients.values().stream()
+                .map(ClientHandler::getNick)
+                .collect(Collectors.toList());
+        broadcast(ClientListMessage.of(nicks));
+    }*/
+
     public synchronized void serverMsgToAll(String msg) {
         List<String> allUsersOnline = clients.values().stream().
                 map(ClientHandler::getName).collect(Collectors.toList());
-        //broadcast(ClientListMessage.of(allUsersOnline));
+      // TODO что это такое ClientListMessage ???
+        //  broadcast(ClientListMessage.of(allUsersOnline));
+
+        // пока оставим так
+        for (String s : allUsersOnline) {
+            clients.get(s).sendMsg(msg);
+        }
+
         /* OLD
         for (ClientHandler client : clients) {
             client.sendMsg(msg);
         }
-
-        */
+*/
     }
 
     public synchronized void subscribe(ClientHandler o) {
@@ -91,11 +106,6 @@ public class ChatServer {
         clients.values().forEach(client -> client.sendMsg(msg));
     }
 
-    /*
-    public AuthService getAuthService() {
-        return this.authService;
-    }
-*/
     public synchronized void serverMsgToNick(String senderNick, String mateNick, String mateMsg) {
         System.out.println("проверяем занят ли ник которому прислали приватное сообщение");
         if (isNickBusy(mateNick)) {
@@ -112,7 +122,7 @@ public class ChatServer {
         } else {
             System.out.println("");
             //если такого ника нет на связи, отсылаем сообщение отправителю
-            // ToDo new code...
+            // ToDo
 
 
             //my oldcode
@@ -121,6 +131,20 @@ public class ChatServer {
                     client.sendMsg("Сервер: Ошибка! нет пользователя с ником " + mateMsg + "!");
                 }
             }*/
+        }
+    }
+
+    public void serverMsgToNickNew(ClientHandler from, String mate, String msg) {
+        System.out.println("serverMsgToNickNew: "+from.getName()+"sends to"+mate+"message = <"+msg+">");
+        ClientHandler mateLink = clients.get(mate);
+        if(mateLink!= null) {
+            System.out.println("mateLink is not null");
+            mateLink.sendMsg("from: "+from.getName()+": "+msg);
+            from.sendMsg("Mate "+mateLink.getName()+" got message from you = "+msg);
+
+        }
+        else {
+            from.sendMsg(Command.ERROR,"No such nick in the chat");
         }
     }
 }

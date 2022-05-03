@@ -15,6 +15,9 @@ public class ClientHandler {
     private String name;
     private AuthService authService;
 
+    public boolean authTimeOutFlag;
+    public boolean userAuthenticated;
+
     public String getName() {
         return name;
     }
@@ -27,10 +30,14 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "";
             this.authService=authService;
+            this.authTimeOutFlag =false;
+            this.userAuthenticated=false;
+
 
             new Thread(() -> {
                 try {
                     authentication();
+                    if (authTimeOutFlag) closeConnection();
                     readMessages();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -43,30 +50,33 @@ public class ClientHandler {
         }
     }
 
+    public void authentication() throws IOException {
+        // homework lesson 8!
 
-    public void auth () {
-        while (true) {
+        Thread loginTimeOutThread = new Thread(() -> {
+            for (int i = 0; i < 15; i++) {
+                System.out.println("login timeout for this client at socket"+this.socket+" is "+(15-i));
 
-            try {
-                final String buf = in.readUTF();
-                if (buf.startsWith("/auth")) {
-                    final String[] buf2 = buf.split(" "); // buf2[0]="/auth"
-                    final String login=buf2[1];
-                    final String pass=buf2[2];
-
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                if (this.userAuthenticated) break;
             }
 
-        }
-    }
+            if (!this.userAuthenticated) {
+                System.out.println("login timed out for "+name+"!");
+                this.authTimeOutFlag =true;
+            }
 
-    //пока оставим метод из (товтология!) методички
-    public void authentication() throws IOException {
+        });
+        loginTimeOutThread.start();
+        // homework lesson 8 END
+
         while (true) {
             String buf = in.readUTF();
+            if (authTimeOutFlag) { sendMsg(Command.ERROR, "Таймаут ввода пароля!"); break; };
             if (Command.isCommand(buf)) {
                 Command command = Command.getCommand(buf);
                 String[] params = command.parse(buf);
@@ -83,7 +93,7 @@ public class ClientHandler {
                         System.out.println("Got nick: " + nick);
                         if (!chatServer.isNickBusy(nick)) {
                             System.out.println("Nick=" + nick + " is not busy");
-                            //sendMsg("/authok " + nick);
+                            this.userAuthenticated=true;
                             sendMsg(Command.AUTHOK,nick);
                             name = nick;
                             chatServer.serverMsgToAll("Сервер: " + name + " зашёл в чат");
@@ -106,27 +116,23 @@ public class ClientHandler {
             String buf = in.readUTF();
             System.out.println("received from "+name + ": " + buf);
 
-            /*
-            if (buf.equals("/end")) {
-                System.out.println("received /end command. Exiting");
-                // default code
-                // return;
-                // [my code] 22/04/22 ->
-                closeConnection();
-                break;
-                // <- [end my code]
-            }
-            */
-
             if (Command.isCommand(buf) ){
+
                 Command cmd = Command.getCommand(buf);
+                String[] params = cmd.parse(buf);
+                System.out.println("Looks like it is a command:"+cmd.getCommand());
+
                 if (cmd == Command.END ) {
+                    System.out.println("Executing END command");
                     //todo оставим ли тут closeConnection(); ?
                     //closeConnection();
                     break;
                 }
-                if () {
-
+                if (cmd == Command.PRIVATE_MESSAGE) {
+                    System.out.println("Executing PRIVATE_MESSAGE command");
+                    // ЛС - от кого, кому и само сообщение.
+                    chatServer.serverMsgToNickNew(this, params[0],params[1]);
+                    continue;
                 }
             }
 
@@ -143,13 +149,20 @@ public class ClientHandler {
             }
             //в остальных случаях
             else {
-                chatServer.serverMsgToAll(name + ": " + buf);
+                //chatServer.serverMsgToAll(name + ": " + buf);
+                chatServer.broadcast(name + ": " + buf);
             }
 
 
         }
     }
+
+    public void sendMsg(Command command, String... params) {
+        sendMsg(command.collectMessage(params));
+
+    }
     public void sendMsg(String msg) {
+
         try {
             out.writeUTF(msg);
             System.out.println("Sending: "+msg);
@@ -189,8 +202,5 @@ public class ClientHandler {
     }
 
 
-    private void sendMsg(Command command, String... params) {
-        sendMsg(command.collectMessage(params));
 
-    }
 }
