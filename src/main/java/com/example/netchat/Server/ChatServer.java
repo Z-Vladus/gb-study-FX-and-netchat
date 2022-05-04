@@ -79,7 +79,7 @@ public class ChatServer {
     public synchronized void serverMsgToAll(String msg) {
         List<String> allUsersOnline = clients.values().stream().
                 map(ClientHandler::getName).collect(Collectors.toList());
-      // TODO что это такое ClientListMessage ??? 8-й урок 2ч 34м
+      // TODO что это такое ClientListMessage ???
         //  broadcast(ClientListMessage.of(allUsersOnline));
 
         // пока оставим так
@@ -101,10 +101,32 @@ public class ChatServer {
     }
 
     private void broadcastClientList() {
+        // из clients детаем строку, где через пробел передаются ники пользунов в системе
+        //вариант 1
         //clients.values().stream().map(client -> client.getName()).collect(Collectors.joining(" "));
         //вариант2 предлагает ИДЕЯ
-        String nicks= clients.values().stream().map(ClientHandler::getName).collect(Collectors.joining(" "));
-        broadcast(Command.CLIENTS, nicks);
+
+        //String nicks= clients.values().stream().map(ClientHandler::getName).collect(Collectors.joining(" "));
+
+        //вариант 3
+        StringBuilder stringBuilderNicks = new StringBuilder();
+
+
+        int i=1;
+        System.out.println("Generating nicks list as parameters string...");
+        for (ClientHandler value : clients.values()) {
+            stringBuilderNicks.append(value.getName());
+            i++;
+            System.out.println("i="+i+" stringBuilderNicks=\""+stringBuilderNicks+"\"");
+            if (i>clients.size()) {
+                System.out.println("Looks like more nick to append, adding \" \" (space)");
+                stringBuilderNicks.append(" ");
+            }
+        }
+        System.out.println("DONE! Result = \"+stringBuilderNicks+\"");
+        // p.s. ёмоё! а можно было просто stringBuilderNick.trim() - лишний пробел уберёт.
+
+        broadcast(Command.CLIENTS, stringBuilderNicks.toString());
 
     }
 
@@ -112,9 +134,12 @@ public class ChatServer {
         clients.remove(o.getName());
         broadcastClientList();
     }
-    public synchronized void broadcast(String msg) {
+
+    public synchronized void broadcast(Command command, String nicks) {
+        System.out.println("Chatserver.broadcast: "+command+" nicks=\""+nicks+"\"");
         // OLD
         // clients.values().forEach(client -> client.sendMsg(msg));
+
         for (ClientHandler client : clients.values()) {
             client.sendMsg(Command.CLIENTS,nicks);
 

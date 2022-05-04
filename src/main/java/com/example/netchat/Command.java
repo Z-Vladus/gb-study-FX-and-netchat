@@ -45,7 +45,7 @@ public enum Command {
 
 
     },
-    CLIENTS("/"){
+    CLIENTS("/clients"){
         @Override
         public String[] parse(String commandText) {
             String[] split = commandText.split(COMMAND_DELIMITER);

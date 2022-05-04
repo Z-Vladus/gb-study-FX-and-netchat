@@ -150,7 +150,8 @@ public class ClientHandler {
             //в остальных случаях
             else {
                 //chatServer.serverMsgToAll(name + ": " + buf);
-                chatServer.broadcast(name + ": " + buf);
+                //chatServer.broadcast(name + ": " + buf);
+                // Todo что тут писать?
             }
 
 

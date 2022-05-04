@@ -4,6 +4,7 @@ import com.example.netchat.Command;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -13,8 +14,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class NetChatController {
-
     @FXML
+    private ListView clientList;
+     @FXML
     public Button sendButton;
     @FXML
     private HBox loginBox;
@@ -115,5 +117,18 @@ public class NetChatController {
                     new ButtonType("OK", ButtonBar.ButtonData.OK_DONE));
         alert.setTitle("Ошибка!");
         alert.showAndWait();
+    }
+
+    public void selectClient(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() == 2) {
+            String message = messageField.getText();
+            // хм, а в лекции обошлось без cast
+             //String mate1 = clientList.getSelectionModel().getSelectedItem(); // ошибка!
+            String mate = (String) clientList.getSelectionModel().getSelectedItem();
+            // TODO хм, тоже ошибка! 8-й урок 2ч 57m
+            messageField.setText(Command.PRIVATE_MESSAGE.collectMessage(mate,message));
+            messageField.requestFocus();
+            messageField.selectEnd();
+        }
     }
 }
