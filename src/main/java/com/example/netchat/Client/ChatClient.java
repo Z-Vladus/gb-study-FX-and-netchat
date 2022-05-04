@@ -1,5 +1,8 @@
 package com.example.netchat.Client;
 
+import com.example.netchat.Command;
+import javafx.application.Platform;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -12,7 +15,7 @@ public class ChatClient {
 
     private final NetChatController controller;
 
-    public ChatClient(NetChatController controller) {
+     public ChatClient(NetChatController controller) {
         this.controller = controller;
     }
 
@@ -23,15 +26,16 @@ public class ChatClient {
         in = new DataInputStream(s.getInputStream());
         out = new DataOutputStream(s.getOutputStream());
 
-        new Thread(() -> {
+        Thread readThread = new Thread (() -> {
             try {
                 waitAuth();
                 readMsg();
             } finally {
               closeConnection();  
             }
-        }).start();
-
+        });
+        readThread.setDaemon(true);
+        readThread.start();
     }
 
     private void closeConnection() {
@@ -48,10 +52,24 @@ public class ChatClient {
                 System.out.println("Reading input stream...");
                 String buf = in.readUTF();
                 System.out.println("Done. Result: "+buf);
-                if("/end".equals(buf)) {
-                    controller.setAuth(false);
-                    break;
+
+                if (Command.isCommand(buf)) {
+                    Command cmd = Command.getCommand(buf);
+                    String[] params = cmd.parse(buf);
+                    if(cmd == Command.END) {
+                        controller.setAuth(false);
+                        break;
+                    }
+                    if (cmd == Command.ERROR) {
+                        Platform.runLater(() -> controller.showError(params));
+                        // OLD
+                        // controller.showError(params);
+                        break;
+                        // continue;
+                    }
                 }
+
+
                 controller.addMessage("readMSG: "+buf);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -67,14 +85,24 @@ public class ChatClient {
                 System.out.println("waiting for server auth reply...");
                 String buf = in.readUTF();
                 System.out.println("Got reply from server. buf="+buf);
-                if (buf.startsWith("/authok")) {
-                    String[] bufSplitted = buf.split(" ");
-                    String nick = bufSplitted[1];
-                    controller.addMessage("Auth good with nick = "+nick);
-                    controller.setAuth(true);
+                if (Command.isCommand(buf)) {
+                    Command cmd = Command.getCommand(buf);
+                    String[] params = cmd.parse(buf);
+                    if (cmd == Command.AUTHOK) {
+                        String nick = params[0];
+                        controller.addMessage("Auth good with nick = "+nick);
+                        controller.setAuth(true);
+                        break;
+                    }
+                    if (cmd==Command.ERROR) {
+                        // так - неверно, будет ошибка
+                        //controller.showError(params);
+                        // а вот с таким магическим заклинанием - норм!
+                        Platform.runLater(() -> controller.showError(params));
+                    }
 
-                    break;
                 }
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -89,6 +117,13 @@ public class ChatClient {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    public void sendMessage(Command cmd, String... params) {
+         sendMessage(cmd.collectMessage(params));
+
+
 
     }
 }

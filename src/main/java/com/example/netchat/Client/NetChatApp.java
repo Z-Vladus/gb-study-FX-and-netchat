@@ -12,7 +12,7 @@ public class NetChatApp extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(NetChatApp.class.getResource("NetChat-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 640, 480);
-        stage.setTitle("Net Chat APP v0.4");
+        stage.setTitle("Net Chat APP v3 Release");
         stage.setScene(scene);
         stage.show();
     }

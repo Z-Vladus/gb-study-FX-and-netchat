@@ -1,5 +1,6 @@
 package com.example.netchat.Client;
 
+import com.example.netchat.Command;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -9,10 +10,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class NetChatController {
-
-    private ChatClient client;
 
     @FXML
     public Button sendButton;
@@ -31,8 +31,39 @@ public class NetChatController {
     @FXML
     private TextField messageField;
 
+    private final ChatClient client;
+
+    public NetChatController() {
+        client = new ChatClient(this);
+        while (true) {
+            try {
+                client.openConnection();
+                break;
+            }
+            catch (Exception e) {
+                showNotification();
+            }
+        }
+    }
+
+    private void showNotification() {
+        final Alert alert = new Alert(Alert.AlertType.ERROR,
+                "Could not connect to server",
+                new ButtonType("Try again",ButtonBar.ButtonData.OK_DONE),
+                new ButtonType("Quit",ButtonBar.ButtonData.CANCEL_CLOSE)
+                );
+        alert.setTitle("Connection error");
+        Optional<ButtonType> buttonType = alert.showAndWait();
+        Boolean isExit = buttonType.map(btn -> btn.getButtonData().isCancelButton()).orElse(false);
+        if (isExit) {
+            System.exit(1);
+        }
+    }
+
+    ;
+/* DEFAULT
     public NetChatController(){
-        this.client=new ChatClient(this);
+        this.client= new ChatClient(this);
         try {
             client.openConnection();
         } catch (IOException e) {
@@ -40,7 +71,7 @@ public class NetChatController {
         }
 
     }
-
+*/
     public void sendButtonClick(ActionEvent actionEvent) {
         //System.out.println("sendbtnclick");
         //if (messageField.getText().length()>1) { // если есть что посылать
@@ -59,7 +90,8 @@ public class NetChatController {
     public void authButtonClick(ActionEvent actionEvent) {
         //loginField.setText("user1");
         //passwordField.setText("pass1");
-        client.sendMessage("/auth "+loginField.getText() + " "+ passwordField.getText());
+        //client.sendMessage("/auth "+loginField.getText() + " "+ passwordField.getText());
+        client.sendMessage(Command.AUTH,loginField.getText(),passwordField.getText());
 
     }
 
@@ -74,5 +106,14 @@ public class NetChatController {
         sendButton.setVisible(authorized);
         messageField.setVisible(authorized);
 
+    }
+
+    public void showError(String[] error) {
+        Alert alert =
+                new Alert(Alert.AlertType.ERROR,
+                    error[0],
+                    new ButtonType("OK", ButtonBar.ButtonData.OK_DONE));
+        alert.setTitle("Ошибка!");
+        alert.showAndWait();
     }
 }
