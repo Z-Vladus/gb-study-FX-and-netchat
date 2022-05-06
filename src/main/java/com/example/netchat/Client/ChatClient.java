@@ -27,6 +27,7 @@ public class ChatClient {
         out = new DataOutputStream(s.getOutputStream());
 
         Thread readThread = new Thread (() -> {
+            System.out.println("readThread started...");
             try {
                 waitAuth();
                 readMsg();
@@ -47,7 +48,8 @@ public class ChatClient {
     }
 
     private void readMsg() {
-        while (true){
+        System.out.println("readMsg started...");
+         while (true){
             try {
                 System.out.println("Reading input stream...");
                 String buf = in.readUTF();
@@ -56,16 +58,26 @@ public class ChatClient {
                 if (Command.isCommand(buf)) {
                     Command cmd = Command.getCommand(buf);
                     String[] params = cmd.parse(buf);
+                    System.out.println("Command detected: "+cmd);
+                    System.out.println("params detected: "+params);
                     if(cmd == Command.END) {
+                        System.out.println("Command.END: ");
                         controller.setAuth(false);
                         break;
                     }
                     if (cmd == Command.ERROR) {
-                        Platform.runLater(() -> controller.showError(params));
+                        System.out.println("Command.ERROR: ");
+                        //controller.setAuth(false); // надо ли?
                         // OLD
                         // controller.showError(params);
-                        break;
-                        // continue;
+                        Platform.runLater(() -> controller.showError(params));
+                        //break;
+                        continue;
+                    }
+                    if (cmd==Command.CLIENTS) {
+                        controller.updClientList(params);
+                        //continue или всё ж break?
+                        continue;
                     }
                 }
 
@@ -80,7 +92,8 @@ public class ChatClient {
     }
 
     private void waitAuth() {
-        while (true) {
+        System.out.println("waitAuth() method started");
+         while (true) {
             try {
                 System.out.println("waiting for server auth reply...");
                 String buf = in.readUTF();
@@ -122,8 +135,5 @@ public class ChatClient {
 
     public void sendMessage(Command cmd, String... params) {
          sendMessage(cmd.collectMessage(params));
-
-
-
     }
 }

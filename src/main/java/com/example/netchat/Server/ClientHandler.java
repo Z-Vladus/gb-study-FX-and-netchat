@@ -55,10 +55,10 @@ public class ClientHandler {
 
         Thread loginTimeOutThread = new Thread(() -> {
             for (int i = 0; i < 15; i++) {
-                System.out.println("login timeout for this client at socket"+this.socket+" is "+(15-i));
+                System.out.println("login timeout for client at socket"+this.socket+" is "+(15-i)*10+" sec.");
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -160,10 +160,9 @@ public class ClientHandler {
 
     public void sendMsg(Command command, String... params) {
         sendMsg(command.collectMessage(params));
-
     }
-    public void sendMsg(String msg) {
 
+    public void sendMsg(String msg) {
         try {
             out.writeUTF(msg);
             System.out.println("Sending: "+msg);

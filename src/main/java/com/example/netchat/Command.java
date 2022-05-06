@@ -125,16 +125,15 @@ public enum Command {
         if (command1==null) {
             throw new RuntimeException("<"+"> is not a recognized command!");
         }
-
-
         return null;
-
     }
 
     public abstract String[] parse(String commandText);
 
-    public String collectMessage(String[] params) {
+    public String collectMessage(String... params) {
+        System.out.println("collectMessage command got params= <"+params+">");
         String cmd = this.getCommand();
+
         /*
         String join = String.join(" ", params);
         return cmd + " " + join;

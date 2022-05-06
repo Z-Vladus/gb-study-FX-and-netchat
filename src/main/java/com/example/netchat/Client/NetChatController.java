@@ -35,6 +35,17 @@ public class NetChatController {
 
     private final ChatClient client;
 
+    /* DEFAULT
+    public NetChatController(){
+        this.client= new ChatClient(this);
+        try {
+            client.openConnection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+*/
     public NetChatController() {
         client = new ChatClient(this);
         while (true) {
@@ -62,18 +73,6 @@ public class NetChatController {
         }
     }
 
-    ;
-/* DEFAULT
-    public NetChatController(){
-        this.client= new ChatClient(this);
-        try {
-            client.openConnection();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-*/
     public void sendButtonClick(ActionEvent actionEvent) {
         //System.out.println("sendbtnclick");
         //if (messageField.getText().length()>1) { // если есть что посылать
@@ -130,5 +129,10 @@ public class NetChatController {
             messageField.requestFocus();
             messageField.selectEnd();
         }
+    }
+
+    public void updClientList(String[] params) {
+        clientList.getItems().clear();
+        clientList.getItems().addAll(params);
     }
 }
